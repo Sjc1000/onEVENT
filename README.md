@@ -21,7 +21,7 @@ This is how its set out,
 	}
 ]
 
-If you're familiar with the JSON syntax this will some sort of sense to you.
+If you're familiar with the JSON syntax this make will some sort of sense to you.
 Ill explain what these are about:
 "eventname" is the eventname.py file ( without the .py ). It runs the event with the params.
 result can be 1 if you want the eventname.py to be true, or 0 if you want it to be false.
@@ -37,7 +37,7 @@ this is an example of more than 1 command.
 	
 repeat can be "0" or "1", 0 if you only want the command to run once the event switches from false to true. If it is 1 it will repeat depending on the "delay" param.
 "repeat" the time to wait between checking if the event is true or false. 
-{"seconds": "ammount", "minutes": "ammount", "hours": "ammount"}
+{"seconds": "amount", "minutes": "amount", "hours": "amount"}
 	
 {"seconds": 10, "minutes": 1}
 This will run the command every minute and 10 seconds.
