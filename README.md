@@ -12,14 +12,15 @@ First, ill show you an example of an event.
 
 ```JSON
 {"on": [{"*event*": "**inputdevice**", "*params*": ["**Logitech USB Receiver**"], "*result*": "**1**"}],
-	"*action*": [**["notify-send", "Mouse", "{0} connected."]**],
+	"*action*": **[["notify-send", "Mouse", "{0} connected."]]**,
 	"*repeat*": "**0**",
-	"*delay*": **{"*seconds*": "**0**"}**
+	"*delay*": **{"seconds": "**0**"}**
 }
 ```
 
-The things that are *italic* are the params, and the **bold** things are values, the **bold** items are the one you change.
+The things with * are the params, and the **** things are values, the ** items are the one you change.
 
+###params
 *event* - Change this to the event you want to check, this is the name of the event file in the events folder. Without the .py extension
 
 *params* - The params you wish to pass to the event file, each event file has different params so i can't cover all of them here. Use python eventfile.py to find out info about each event.
