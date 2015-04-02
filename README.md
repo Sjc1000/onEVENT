@@ -21,7 +21,8 @@ First, ill show you an example of an event.
 The things with * are the params, and the ** things are values, the ** items are the one you change.
 
 ###params
-*event* - Change this to the event you want to check, this is the name of the event file in the events folder. Without the .py extension
+
+**event** - Change this to the event you want to check, this is the name of the event file in the events folder. Without the .py extension
 
 **params** - The params you wish to pass to the event file, each event file has different params so i can't cover all of them here. Use python eventfile.py to find out info about each event.
 
@@ -41,6 +42,54 @@ The things with * are the params, and the ** things are values, the ** items are
  
  You can add more than 1 event, they will all have to match their *result* to be true, if not it will be false.
  
- You will notice that the terminal commands are split up, ["command", "param 1", "param 2", "-b", "-b param"]
+ You will notice that the terminal commands are split up, ["command", "param 1", "param 2", "-b", "param for -b"]
  This is so my program knows where the params are.
 
+
+## Built in events
+
+This is a list of events i have built, and plan to build. Feel free to contact me with any ideas or suggestions for events, i will be happy to hear them and maybe even implement them!
+
+- [ ]	Battery Percentage
+- [X]	CPU Percentage
+- [X]	Filepath Exists
+- [X]	Device plugged in
+- [X]	Internet connection
+- [X]	New file in directory
+- [X]	Process exists
+- [ ]	RAM Usage
+- [X]	Time
+- [X]	Uptime
+- [ ]	Many more!
+
+
+## Adding your own events
+
+Say what? I can add my own events?!?
+Yes, you certainly can. It is very easy.
+
+Just make a new .py file in the events folder, name it whatever you want.
+Inside the file define a function that is the same as your file name. For example if i want, say a weather event. Ill name it weather.py and put in
+```Python
+def weather(params)
+	* do stuff here *
+	return (1, 'Output')
+```
+
+Now, you may be thinking how my program knows if this event will be true or not. You have to return a tuple in each function.
+
+```Python
+return (1, 'Param1', 'param2')
+```
+or
+```Python
+return (0, 'Param1', 'Param2')
+```
+
+If the first item is 1 the event returns true, 0 is false. You can also return params, which use can use in the 'action' in the events file.
+
+For example, if i return (1, 'This is a test!')
+and in the action i use {0}, {0} will get replaced with This is a test!
+{0} is the first param you return, {1} is the second, and so on.
+You can specify more params and use {1}, {2}, {3}  to your desire!
+Fun huh? :D
