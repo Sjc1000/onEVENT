@@ -52,6 +52,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 
 - [ ]	Battery Percentage
 - [X]	CPU Percentage
+- [X]	Facebook Notification
 - [X]	Filepath Exists
 - [X]	Device plugged in
 - [X]	Internet connection
@@ -62,6 +63,16 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	Uptime
 - [ ]	Many more!
 
+
+**notes**
+
+####Facebook Notification
+Yes, you heard right! This program supports Facebook Notifications. You will need to pass a certain URL to the facebook event for this to work. I will explain how to get this url.
+
+1. Open your facebook to https://www.facebook.com/notifications
+2. Click the little RSS button. This is next to the 'Get Notifications via' text.
+3. Change the format param of the url, by default it looks like &format=rss20, change it to &format=json
+4. Paste the link into your event and you're done!
 
 ## Adding your own events
 
