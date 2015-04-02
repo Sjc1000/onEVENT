@@ -82,6 +82,7 @@ Now, you may be thinking how my program knows if this event will be true or not.
 return (1, 'Param1', 'param2')
 ```
 or
+
 ```Python
 return (0, 'Param1', 'Param2')
 ```
