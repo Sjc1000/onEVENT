@@ -24,5 +24,12 @@
 		"repeat": "0",
 		"delay": {"seconds": "1"},
 		"alternative": [["notify-send", "Controller", "X-Box controller disconnected."]]
+	},
+	
+	{"on": [{"event": "procexists", "params": ["gedit"], "result": "1"}],
+		"action": [["notify-send", "gEdit", "gEdit open!"]],
+		"repeat": "0",
+		"delay": {"seconds": "1"},
+		"alternative": [["notify-send", "gEdit", "gEdit closed!"]]
 	}
 ]
