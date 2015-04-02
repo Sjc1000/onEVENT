@@ -18,26 +18,27 @@ First, ill show you an example of an event.
 }
 ```
 
-The things with * are the params, and the **** things are values, the ** items are the one you change.
+The things with * are the params, and the ** things are values, the ** items are the one you change.
 
 ###params
 *event* - Change this to the event you want to check, this is the name of the event file in the events folder. Without the .py extension
 
-*params* - The params you wish to pass to the event file, each event file has different params so i can't cover all of them here. Use python eventfile.py to find out info about each event.
+**params** - The params you wish to pass to the event file, each event file has different params so i can't cover all of them here. Use python eventfile.py to find out info about each event.
 
-*result* - This is 1 if you want the event to be true, 0 if you want the event to be false.
+**result** - This is 1 if you want the event to be true, 0 if you want the event to be false.
 
-*action* - The linux terminal command/s to run when the *result* matches the event outcome.
+**action** - The linux terminal command/s to run when the *result* matches the event outcome.
 
-*repeat* - 1 if you want this command to repeat until the event is false, 0 if you want the command to run 1 time until the command is false.
+**repeat** - 1 if you want this command to repeat until the event is false, 0 if you want the command to run 1 time until the command is false.
 
-*delay* - The delay between checks if the event is true or false. Items can be any combination of seconds, minutes, hours.	{"seconds": 10, "minutes": 4} will check an event every 4 minutes and 10 seconds.
+**delay** - The delay between checks if the event is true or false. Items can be any combination of seconds, minutes, hours.	{"seconds": 10, "minutes": 4} will check an event every 4 minutes and 10 seconds.
 
 ( optional )
- *alternative* - The linux terminal command to run when the event is false.
+ **alternative** - The linux terminal command to run when the event is false.
  
  
  **notes**
+ 
  You can add more than 1 event, they will all have to match their *result* to be true, if not it will be false.
  
  You will notice that the terminal commands are split up, ["command", "param 1", "param 2", "-b", "-b param"]
