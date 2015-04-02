@@ -84,11 +84,6 @@ class onEVENT():
 		else:
 			self.events[index].last_time = current_time
 			return 0
-		if event.events[0]['event'] == 'facebook':
-			print( event.delay )
-			print( current_time )
-			print( event.last_time )
-
 		
 		self.events[index].last_time = current_time
 		
