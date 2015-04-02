@@ -90,17 +90,19 @@ class onEVENT():
 		event_data = event.run(self.sources)
 		check_data = [x[0] for x in event_data]
 		
-		self.events[index].last_data = check_data
-				
+		
 		if event.last_data == None:
+			self.events[index].last_data = check_data
 			return 0
 				
 		if int(event.repeat) == 0 and event.last_data == check_data:
 			return 0
-				
+		print( '[' + event.events[0]['event'] + '] ' + str(event.last_data) + ' --> ' + str(check_data) )
 		params = []
 		output = self.checkoutput(event, event_data)
-				
+		
+		self.events[index].last_data = check_data
+		
 		for p in event_data:
 			for i, par in enumerate(p):
 				if i == 0:
