@@ -1,14 +1,21 @@
 # onEVENT
 
-An event setup for PC. Inspiration from an Android app called Tasker.
-
-onEVENT is designed for people who are some kind of familiar with the Linux Terminal. The output commands are Terminal commands.
+onEVENT is an event based automation tool for Linux. It watches events such as battery percentage, input devices, cpu and even facebook notifications. You can specify any Terminal command to run when these event results are what you want them to be.
 
 ## Event file
 
 Ill explain how to add things to the event file so you can have your own events!
 
 First, ill show you an example of an event.
+
+```JSON
+{"on": [{"event": "inputdevice", "params": ["Logitech USB Receiver"], "result": "1"}],
+	"action": [["notify-send", "Mouse", "{0} connected."]],
+	"repeat": "0",
+	"delay": {"seconds": "0"}
+}
+```
+This is what it all means:
 
 ```JSON
 {"on": [{"*event*": "**inputdevice**", "*params*": ["**Logitech USB Receiver**"], "*result*": "**1**"}],
@@ -35,7 +42,8 @@ The things with * are the params, and the ** things are values, the ** items are
 **delay** - The delay between checks if the event is true or false. Items can be any combination of seconds, minutes, hours.	{"seconds": 10, "minutes": 4} will check an event every 4 minutes and 10 seconds.
 
 ( optional )
- **alternative** - The linux terminal command to run when the event is false.
+
+**alternative** - The linux terminal command to run when the event is false.
  
  
  **notes**
@@ -52,6 +60,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 
 - [X]	Battery
 - [X]	CPU Percentage
+- [ ]	Email
 - [X]	Facebook Notification
 - [X]	Filepath Exists
 - [X]	Input Device plugged in
@@ -59,6 +68,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	New file in directory
 - [X]	Process exists
 - [ ]	RAM Usage
+- [ ]	Temperature
 - [X]	Time
 - [X]	Uptime
 - [ ]	Many more!
@@ -88,7 +98,7 @@ Just make a new .py file in the events folder, name it whatever you want.
 Inside the file define a function that is the same as your file name. For example if i want, say a weather event. Ill name it weather.py and put in
 ```Python
 def weather(params)
-	* do stuff here *
+	# do stuff here
 	return (1, 'Output')
 ```
 
