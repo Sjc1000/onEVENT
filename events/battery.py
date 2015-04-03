@@ -20,8 +20,9 @@ def getbatterylevel():
 	battery = getbatteryinfo()
 	current = battery['charge_now']
 	full = battery['charge_full']
-	perc = round(int(current) / int(full) * 100 )
-	return perc
+	capacity = battery['capacity']
+	perc = round((int(current) / int(full) * 100 ))
+	return perc // int(capacity) * 100
 
 def _is(level):
 	return (getbatterylevel() == int(level), getbatterylevel())
