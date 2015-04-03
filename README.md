@@ -54,7 +54,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	CPU Percentage
 - [X]	Facebook Notification
 - [X]	Filepath Exists
-- [X]	Device plugged in
+- [X]	Input Device plugged in
 - [X]	Internet connection
 - [X]	New file in directory
 - [X]	Process exists
@@ -65,6 +65,11 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 
 
 **notes**
+
+####Battery
+The battery percentage may not be the same as your monitor one is. This does not mean its wrong, i have no idea how the system monitors it.
+
+I might be doing the math wrong, but i've checked multiple sources and they all they thats how you do it.
 
 ####Facebook Notification
 Yes, you heard right! This program supports Facebook Notifications. You will need to pass a certain URL to the facebook event for this to work. I will explain how to get this url.
