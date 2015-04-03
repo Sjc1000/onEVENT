@@ -5,6 +5,7 @@ import time
 import datetime
 import threading
 from subprocess import call
+from pprint import pprint, colors as c
 
 class newevent():
 	events = None
@@ -35,10 +36,12 @@ class onEVENT():
 		self._eventfolder = eventfolder
 		self._eventfile = eventfile
 		self.loadevents()
+		pprint('Ready to go!')
 	
 	def loadevents(self):
 		with open(self._eventfile) as efile:
 			edata = json.loads(efile.read())
+		pprint('Reading event file and creating event classes.')
 		for ev in edata:
 			if not 'alternative' in ev:
 				ev['alternative'] = None
@@ -46,6 +49,7 @@ class onEVENT():
 			self.events.append(new_event)
 		
 		filelist = [f for f in os.listdir(self._eventfolder) if f.endswith('.py')]
+		pprint('Importing event source files.')
 		for event in filelist:
 			self.sources[event[:event.index('.')]] = imp.load_source(event, self._eventfolder + event )
 		return 0
@@ -97,7 +101,8 @@ class onEVENT():
 				
 		if int(event.repeat) == 0 and event.last_data == check_data:
 			return 0
-		print( '[' + event.events[0]['event'] + '] ' + str(event.last_data) + ' --> ' + str(check_data) )
+
+		pprint( c['blue'] + '[' + c['green'] + event.events[0]['event'] + c['blue'] + ' | ' + c['red'] + ', '.join(event.events[0]['params']) + c['blue'] + '] ' + c['end'] + str(event.last_data) + ' --> ' + str(check_data) )
 		params = []
 		output = self.checkoutput(event, event_data)
 		
@@ -117,6 +122,7 @@ class onEVENT():
 			for command in enumerate(event.alternative):
 				command = [ c.format(*params) for c in command[1] ]
 				call(command)
+		return 0
 				
 
 
