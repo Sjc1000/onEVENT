@@ -50,7 +50,7 @@ The things with * are the params, and the ** things are values, the ** items are
 
 This is a list of events i have built, and plan to build. Feel free to contact me with any ideas or suggestions for events, i will be happy to hear them and maybe even implement them!
 
-- [ ]	Battery Percentage
+- [X]	Battery
 - [X]	CPU Percentage
 - [X]	Facebook Notification
 - [X]	Filepath Exists
