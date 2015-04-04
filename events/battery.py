@@ -22,7 +22,9 @@ def getbatterylevel():
 	full = battery['charge_full']
 	capacity = battery['capacity']
 	perc = round((int(current) / int(full) * 100 ))
-	return perc // int(capacity) * 100
+	if perc > 100:
+		perc = 100
+	return perc
 
 def _is(level):
 	return (getbatterylevel() == int(level), getbatterylevel())
@@ -50,6 +52,7 @@ def battery(function, *params):
 		- function - can be is, between, smaller, larger, charging, full.
 		- params - params to be passed to each function.
 	'''
+	getbatterylevel()
 	if '_' + function in globals():
 		return globals()['_'+function](*params)
 	return (0, 'None')
