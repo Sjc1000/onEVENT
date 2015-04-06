@@ -2,6 +2,14 @@
 
 onEVENT is an event based automation tool for Linux. It watches events such as battery percentage, input devices, cpu and even facebook notifications. You can specify any Terminal command to run when these event results are what you want them to be.
 
+## Command line arguments
+
+This program supports a few command line params. None of these are needed to run the program.
+
+- --verbose | -v : Verbose mode. Tells the program to output information to the terminal. It uses my pprint lib which makes things look purrdy :3
+- --folder	 : The folder the event files are located in. Defaults to events/
+- --file	 : The JSON file that your events are in. Defaults to events.json
+
 ## Event file
 
 Ill explain how to add things to the event file so you can have your own events!
@@ -58,23 +66,34 @@ The things with * are the params, and the ** things are values, the ** items are
 
 This is a list of events i have built, and plan to build. Feel free to contact me with any ideas or suggestions for events, i will be happy to hear them and maybe even implement them!
 
-- [X]	Battery
-- [X]	CPU Percentage
+- [X]	Battery			| battery.py
+- [X]	Brightness		| brightness.py
+- [X]	CPU Percentage		| cpu.py
 - [ ]	Email
-- [X]	Facebook Notification
-- [X]	Filepath Exists
-- [X]	Input Device plugged in
-- [X]	Internet connection
-- [X]	New file in directory
-- [X]	Process exists
-- [ ]	RAM Usage
+- [X]	Facebook Notification	| facebook.py
+- [X]	File changed		| filechanged.py
+- [X]	Filepath Exists		| exists.py
+- [X]	Input Device plugged in	| inputdevice.py
+- [X]	Internet connection	| internet.py
+- [X]	Lid closed ( Laptop )	| lidclosed.py
+- [X]	New file in directory	| newfile.py
+- [X]	Process exists		| procexists.py
+- [X]	Power button press	| powerbutton.py
+- [X]	RAM Usage		| ram.py
 - [ ]	Temperature
-- [X]	Time
-- [X]	Uptime
+- [X]	Time			| time.py
+- [X]	Uptime			| uptime.py
 - [ ]	Many more!
 
 
 **notes**
+
+Some of these commands load from files that may be different on your system. If you experience an error like 'FileNotFound' or something similar you may need to change some code. If you're not familiar with Python this may not be easy. 
+
+Please pay attention to what file the error is coming from then search for the linux file it may be. For example, if the battery event puts out an error like this google 'linux ( your distro ) battery class file' or something similar. 
+
+You will then need to change the directory in the event file. This should be easy to locate, since only 1 part of my code should look like a file directory.
+
 
 ####Battery
 The battery percentage may not be the same as your monitor one is. This does not mean its wrong, i have no idea how the system monitors it.
@@ -85,9 +104,14 @@ I might be doing the math wrong, but i've checked multiple sources and they all 
 Yes, you heard right! This program supports Facebook Notifications. You will need to pass a certain URL to the facebook event for this to work. I will explain how to get this url.
 
 1. Open your facebook to https://www.facebook.com/notifications
-2. Click the little RSS button. This is next to the 'Get Notifications via' text.
+2. Click the little RSS button. This is next to the 'Get Notifications via Text message'.
 3. Change the format param of the url, by default it looks like &format=rss20, change it to &format=json
 4. Paste the link into your event and you're done!
+
+####RAM
+
+The ram does not find the 'usable' amount. It just goes off the max amount your PC has. This means it might be different that either your system monitor, or other programs such as conky.
+
 
 ## Adding your own events
 
@@ -97,8 +121,8 @@ Yes, you certainly can. It is very easy.
 Just make a new .py file in the events folder, name it whatever you want.
 Inside the file define a function that is the same as your file name. For example if i want, say a weather event. Ill name it weather.py and put in
 ```Python
-def weather(params)
-	# do stuff here
+def weather(params):
+	#code
 	return (1, 'Output')
 ```
 
@@ -120,3 +144,69 @@ and in the action i use {0}, {0} will get replaced with This is a test!
 {0} is the first param you return, {1} is the second, and so on.
 You can specify more params and use {1}, {2}, {3}  to your desire!
 Fun huh? :D
+
+## Examples
+
+Here are a few quick examples of events you could set up.
+
+** Notify you when your battery is full **
+```JSON
+{"on": [{"event": "battery", "params": ["full"], "result": "1"}],
+	"action": [["notify-send", "Battery", "Battery is now fully charged!"]],
+	"repeat": "0",
+	"delay": {"seconds": "5"}
+}
+```
+
+** Lower system volume when the program Banshee ( music player ) is open. Volume back to 100% when Banshee is closed. ***
+This is useful if you forget to turn down your volume and you get blasted with loud noise.
+```JSON
+{"on": [{"event": "procexists", "params": ["banshee"], "result": "1"}],
+	"action": [["amixer", "sset", "'Master'", "60%"]],
+	"repeat": "0",
+	"delay": {"seconds": "1"},
+	"alternative": [["amixer", "sset", "'Master'", "100%"]]
+}
+```
+
+** If the time is past 10pm and you close your lid. Shut the PC down. **
+```JSON
+{"on": [{"event": "lidclosed", "params": [], "result": "1"},
+		{"event": "time", "params": ["later", "%H", "22"], "result": "1"}],
+	"action": [["shutdown", "-h", "now"]],
+	"repeat": "0",
+	"delay": {"seconds": "1"}
+}
+```
+
+** This has to be run with sudo python3 onEVENT.py **
+
+## Notes
+
+You should be aware that some of these events might not return the same results as your system. For example, on my system, my program measures the battery level at roughly 2% different than my system does. I have no idea what my system is doing, or if my math is wrong ( multiple sources say it's right ). This should not discourage you from using this program, though, you should be aware of this little glitch. 
+
+If you are able to make a better equation that has better results i would be very glad to see it and possibly implement it into these events.
+
+
+### Root commands
+
+If the command you have defined in "action" requires root to run, by default it will fail. You can run sudo python3 onEVENT.py to give onEVENT the ability to run root commands.
+
+
+## Contact
+
+If you wish to contact me you can use any of these methods:
+
+- Email
+	- Main 		> 42Echo6Alpha@gmail.com
+	- Alternative 	> Sjc1000@hotmail.com or insertfunnyaddress@hotmail.com
+
+- IRC
+	I am on IRC quite often.
+	server:	irc.freenode.net ( port 6667 by default )
+	channel: #Sjc_Bot is my channel, If im Sjc_AFK i am not connected. I have a bouncer that changed to AFK when i disconnect.
+
+
+## Thanks
+
+Thank you for using my software. This is and always will be a free to use program. I will not charge a dime for any of my solo development projects.

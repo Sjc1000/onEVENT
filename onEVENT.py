@@ -4,8 +4,12 @@ import imp
 import time
 import datetime
 import threading
-from subprocess import call
+from subprocess import call, DEVNULL
 from pprint import pprint, colors as c
+import argparse
+import sys
+
+__version__ = '2.1.0'
 
 class newevent():
 	events = None
@@ -36,12 +40,14 @@ class onEVENT():
 		self._eventfolder = eventfolder
 		self._eventfile = eventfile
 		self.loadevents()
-		pprint('Ready to go!')
+		if verbose:
+			pprint('Now watching events.')
 	
 	def loadevents(self):
 		with open(self._eventfile) as efile:
 			edata = json.loads(efile.read())
-		pprint('Reading event file and creating event classes.')
+		if verbose:
+			pprint('Reading event file and creating event classes.')
 		for ev in edata:
 			if not 'alternative' in ev:
 				ev['alternative'] = None
@@ -49,7 +55,8 @@ class onEVENT():
 			self.events.append(new_event)
 		
 		filelist = [f for f in os.listdir(self._eventfolder) if f.endswith('.py')]
-		pprint('Importing event source files.')
+		if verbose:
+			pprint('Importing event source files.')
 		for event in filelist:
 			self.sources[event[:event.index('.')]] = imp.load_source(event, self._eventfolder + event )
 		return 0
@@ -101,8 +108,10 @@ class onEVENT():
 				
 		if int(event.repeat) == 0 and event.last_data == check_data:
 			return 0
-
-		pprint( c['blue'] + '[' + c['green'] + event.events[0]['event'] + c['blue'] + ' | ' + c['red'] + ', '.join(event.events[0]['params']) + c['blue'] + '] ' + c['end'] + str(event.last_data) + ' --> ' + str(check_data) )
+		if verbose:
+			space1 = 15-len(event.events[0]['event'])
+			space = 25-len(', '.join(event.events[0]['params'])[:24])
+			pprint( c['blue'] + '[ ' + c['green'] + event.events[0]['event'][:13] + c['blue'] + ' '*space1 + '| ' + c['red'] + ', '.join(event.events[0]['params'])[:24] + ' ' * space + c['blue'] + '| ' + c['green'] + str(check_data) + c['blue'] + ' ]')
 		params = []
 		output = self.checkoutput(event, event_data)
 		
@@ -113,19 +122,27 @@ class onEVENT():
 				if i == 0:
 					continue
 				params.append(par)
-		if output == 1:
+		if output:
 			for command in enumerate(event.action):
 				command = [ c.format(*params) for c in command[1] ]
-				call(command)
-				
-		if output == 0 and event.alternative != None:
+				call(command, stdout=DEVNULL)
+	
+		if not output and event.alternative != None:
 			for command in enumerate(event.alternative):
 				command = [ c.format(*params) for c in command[1] ]
-				call(command)
+				call(command, stdout=DEVNULL)
 		return 0
-				
 
+parser = argparse.ArgumentParser(description='onEVENT event based system for the Linux terminal.', prog='onEVENT')
+parser.add_argument('--file', help='The location of the file where your events are.', default='events.json')
+parser.add_argument('--folder', help='The folder where all the events are stored.', default='events/')
+parser.add_argument('-v', '--verbose', help='Verbose mode. Displays the output of everything', action='store_true')
+parser.add_argument('-V', action='version', version='%(prog)s is currently version ' + str(__version__))
+parser.add_argument('-T', '--timeout', help='The timeout between the checking the events.', default=1, type=int)
+
+args = parser.parse_args()
+verbose = args.verbose
 
 if __name__ == '__main__':
-	onEVENT = onEVENT('events/','events.json')
-	onEVENT.eventloop()
+	onEVENT = onEVENT(args.folder,args.file)
+	onEVENT.eventloop(args.timeout)
