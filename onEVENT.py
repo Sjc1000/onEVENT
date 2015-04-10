@@ -19,12 +19,13 @@ class newevent():
 	last_data = None
 	last_time = None
 	alternative = None
-	def __init__(self, events, action, repeat, delay, alternative=None):
+	def __init__(self, events, action, repeat, delay, alternative=None, id=None):
 		self.events = events
 		self.action = action
 		self.repeat = repeat
 		self.delay = delay
 		self.alternative = alternative
+		self.id = id
 		
 	def run(self, sources):
 		output = []
@@ -32,6 +33,18 @@ class newevent():
 			function = getattr(sources[event['event']], event['event'])
 			output.append(function(*event['params']))	
 		return output
+	
+	def reload(self):
+		with open(eventfile, 'r') as efolder:
+			data = efolder.read()
+		obj = json.loads(data)
+		self.repeat = obj[self.id]['repeat']
+		self.delay = obj[self.id]['delay']
+		self.events = obj[self.id]['on']
+		self.action = obj[self.id]['action']
+		if self.alternative != None:
+			self.alternatice = obj[self.id]['alternative']
+		return 0
 
 class onEVENT():
 	events = []
@@ -40,18 +53,31 @@ class onEVENT():
 		self._eventfolder = eventfolder
 		self._eventfile = eventfile
 		self.loadevents()
+		
+		if attemptreload:
+			reload_thread = threading.Thread(target=self.reloadloop)
+			reload_thread.daemon = True
+			reload_thread.start()
+		
 		if verbose:
 			pprint('Now watching events.')
+	
+	def reloadloop(self):
+		while True:
+			for event in self.events:
+				event.reload()
+			time.sleep(60)
+		return 0
 	
 	def loadevents(self):
 		with open(self._eventfile) as efile:
 			edata = json.loads(efile.read())
 		if verbose:
 			pprint('Reading event file and creating event classes.')
-		for ev in edata:
+		for index, ev in enumerate(edata):
 			if not 'alternative' in ev:
 				ev['alternative'] = None
-			new_event = newevent(ev['on'], ev['action'], ev['repeat'], ev['delay'], ev['alternative'])
+			new_event = newevent(ev['on'], ev['action'], ev['repeat'], ev['delay'], ev['alternative'], index)
 			self.events.append(new_event)
 		
 		filelist = [f for f in os.listdir(self._eventfolder) if f.endswith('.py')]
@@ -104,7 +130,6 @@ class onEVENT():
 		
 		if event.last_data == None:
 			self.events[index].last_data = check_data
-			return 0
 				
 		if int(event.repeat) == 0 and event.last_data == check_data:
 			return 0
@@ -123,13 +148,23 @@ class onEVENT():
 					continue
 				params.append(par)
 		if output:
-			for command in enumerate(event.action):
-				command = [ c.format(*params) for c in command[1] ]
-				call(command, stdout=DEVNULL)
+			if isinstance(params[0], list):
+				for data in params[0]:
+					for command in enumerate(event.action):
+						if isinstance(data, dict):
+							command = [c.format(**data) for c in command[1]]
+						else:
+							command = [c.format(*data) for c in command[1]]
+						call(command, stdout=DEVNULL)
+			else:
+				for command in enumerate(event.action):
+					command = [c.format(*params) for c in command[1]]
+					print( command )
+					call(command, stdout=DEVNULL)
 	
 		if not output and event.alternative != None:
 			for command in enumerate(event.alternative):
-				command = [ c.format(*params) for c in command[1] ]
+				command = [c.format(*params) for c in command[1]]
 				call(command, stdout=DEVNULL)
 		return 0
 
@@ -137,11 +172,14 @@ parser = argparse.ArgumentParser(description='onEVENT event based system for the
 parser.add_argument('--file', help='The location of the file where your events are.', default='events.json')
 parser.add_argument('--folder', help='The folder where all the events are stored.', default='events/')
 parser.add_argument('-v', '--verbose', help='Verbose mode. Displays the output of everything', action='store_true')
+parser.add_argument('-r', '--reload', help='Makes the program attempt to reload info from the event file every 60 seconds. Will not add new events just reloads current event info.', action='store_true')
 parser.add_argument('-V', action='version', version='%(prog)s is currently version ' + str(__version__))
 parser.add_argument('-T', '--timeout', help='The timeout between the checking the events.', default=1, type=int)
 
 args = parser.parse_args()
 verbose = args.verbose
+eventfile = args.file
+attemptreload = args.reload
 
 if __name__ == '__main__':
 	onEVENT = onEVENT(args.folder,args.file)

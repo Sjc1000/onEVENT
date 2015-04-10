@@ -66,23 +66,24 @@ The things with * are the params, and the ** things are values, the ** items are
 
 This is a list of events i have built, and plan to build. Feel free to contact me with any ideas or suggestions for events, i will be happy to hear them and maybe even implement them!
 
-- [X]	Battery			| battery.py
-- [X]	Brightness		| brightness.py
-- [X]	CPU Percentage		| cpu.py
+- [X]	Battery
+- [X]	Brightness
+- [X]	CPU Percentage
 - [ ]	Email
-- [X]	Facebook Notification	| facebook.py
-- [X]	File changed		| filechanged.py
-- [X]	Filepath Exists		| exists.py
-- [X]	Input Device plugged in	| inputdevice.py
-- [X]	Internet connection	| internet.py
-- [X]	Lid closed ( Laptop )	| lidclosed.py
-- [X]	New file in directory	| newfile.py
-- [X]	Process exists		| procexists.py
-- [X]	Power button press	| powerbutton.py
-- [X]	RAM Usage		| ram.py
+- [X]	Facebook Notification
+- [X]	File changed
+- [X]	Filepath Exists
+- [X]	Input Device plugged in
+- [X]	Internet connection
+- [X]	Lid closed ( Laptop )
+- [X]	New file in directory
+- [X]	Process exists
+- [X]	Power button press
+- [X]	RAM Usage
+- [X]	RSS Feed
 - [ ]	Temperature
-- [X]	Time			| time.py
-- [X]	Uptime			| uptime.py
+- [X]	Time
+- [X]	Uptime
 - [ ]	Many more!
 
 
