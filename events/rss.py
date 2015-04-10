@@ -90,7 +90,6 @@ def rss(rss_url):
 		return (0, 'None')
 	
 	difference = [x for x in current['items'] if x not in previous['items']]
-	print( difference )
 	newamount = len(difference)
 	if newamount:
 		with open('previous/RSS/' + title, 'w') as pfile:
