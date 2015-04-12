@@ -19,13 +19,14 @@ class newevent():
 	last_data = None
 	last_time = None
 	alternative = None
-	def __init__(self, events, action, repeat, delay, alternative=None, id=None):
+	def __init__(self, events, action, repeat, delay, alternative=None, id=None, iterate=0):
 		self.events = events
 		self.action = action
 		self.repeat = repeat
 		self.delay = delay
 		self.alternative = alternative
 		self.id = id
+		self.iterate = int(iterate)
 		
 	def run(self, sources):
 		output = []
@@ -77,7 +78,9 @@ class onEVENT():
 		for index, ev in enumerate(edata):
 			if not 'alternative' in ev:
 				ev['alternative'] = None
-			new_event = newevent(ev['on'], ev['action'], ev['repeat'], ev['delay'], ev['alternative'], index)
+			if not 'iterate' in ev:
+				ev['iterate'] = 0
+			new_event = newevent(ev['on'], ev['action'], ev['repeat'], ev['delay'], ev['alternative'], index, ev['iterate'])
 			self.events.append(new_event)
 		
 		filelist = [f for f in os.listdir(self._eventfolder) if f.endswith('.py')]
@@ -148,7 +151,7 @@ class onEVENT():
 					continue
 				params.append(par)
 		if output:
-			if isinstance(params[0], list):
+			if isinstance(params[0], list) and event.iterate:
 				for data in params[0]:
 					for command in enumerate(event.action):
 						if isinstance(data, dict):
@@ -159,7 +162,6 @@ class onEVENT():
 			else:
 				for command in enumerate(event.action):
 					command = [c.format(*params) for c in command[1]]
-					print( command )
 					call(command, stdout=DEVNULL)
 	
 		if not output and event.alternative != None:

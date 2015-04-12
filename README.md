@@ -70,7 +70,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	Brightness
 - [X]	CPU Percentage
 - [ ]	Email
-- [X]	Facebook Notification
+- [X]	Facebook Notification ( Outdated, use RSS )
 - [X]	File changed
 - [X]	Filepath Exists
 - [X]	Input Device plugged in
@@ -80,7 +80,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	Process exists
 - [X]	Power button press
 - [X]	RAM Usage
-- [X]	RSS Feed
+- [X]	RSS
 - [ ]	Temperature
 - [X]	Time
 - [X]	Uptime
@@ -102,12 +102,11 @@ The battery percentage may not be the same as your monitor one is. This does not
 I might be doing the math wrong, but i've checked multiple sources and they all they thats how you do it.
 
 ####Facebook Notification
-Yes, you heard right! This program supports Facebook Notifications. You will need to pass a certain URL to the facebook event for this to work. I will explain how to get this url.
+Yes, you heard right! This program supports Facebook Notifications. This runs through the RSS event. So make sure to use that one!
 
 1. Open your facebook to https://www.facebook.com/notifications
 2. Click the little RSS button. This is next to the 'Get Notifications via Text message'.
-3. Change the format param of the url, by default it looks like &format=rss20, change it to &format=json
-4. Paste the link into your event and you're done!
+4. Paste the link into your event param, the next param can be anything, just make it different since it uses this to store the previous RSS info. So something like 'Facebook_Feed'.
 
 ####RAM
 
@@ -150,7 +149,7 @@ Fun huh? :D
 
 Here are a few quick examples of events you could set up.
 
-** Notify you when your battery is full **
+**Notify you when your battery is full**
 ```JSON
 {"on": [{"event": "battery", "params": ["full"], "result": "1"}],
 	"action": [["notify-send", "Battery", "Battery is now fully charged!"]],
@@ -159,7 +158,7 @@ Here are a few quick examples of events you could set up.
 }
 ```
 
-** Lower system volume when the program Banshee ( music player ) is open. Volume back to 100% when Banshee is closed. ***
+**Lower system volume when the program Banshee ( music player ) is open. Volume back to 100% when Banshee is closed.**
 This is useful if you forget to turn down your volume and you get blasted with loud noise.
 ```JSON
 {"on": [{"event": "procexists", "params": ["banshee"], "result": "1"}],
@@ -170,7 +169,7 @@ This is useful if you forget to turn down your volume and you get blasted with l
 }
 ```
 
-** If the time is past 10pm and you close your lid. Shut the PC down. **
+**If the time is past 10pm and you close your lid. Shut the PC down.**
 ```JSON
 {"on": [{"event": "lidclosed", "params": [], "result": "1"},
 		{"event": "time", "params": ["later", "%H", "22"], "result": "1"}],
@@ -180,7 +179,7 @@ This is useful if you forget to turn down your volume and you get blasted with l
 }
 ```
 
-** This has to be run with sudo python3 onEVENT.py **
+**This has to be run with sudo python3 onEVENT.py**
 
 ## Notes
 

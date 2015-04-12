@@ -2,8 +2,7 @@ import urllib.request
 import os
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
-
-septags = {'1.0': 'entry', '2.0': 'item'}
+import socket
 
 class htmlStripper(HTMLParser):
 	def __init__(self):
@@ -19,12 +18,20 @@ class htmlStripper(HTMLParser):
 	def get_data(self):
 		return ''.join(self.data)
 
-def strip(html):
+def strip(html, item):
+	if 'author' in item.tag:
+		if len(item):
+			return item[0].text
 	s = htmlStripper()
 	if html == None:
 		return None
 	s.feed(html)
 	return s.get_data()
+
+def strbrackets(data):
+	if '}' in data:
+		return data[data.find('}')+1:]
+	return data
 
 def main():
 	'''main
@@ -35,66 +42,43 @@ def main():
 	return 0
 
 def download(url):
-	request = urllib.request.urlopen(url)
-	data = request.read()
 	try:
+		request = urllib.request.urlopen(url, timeout=30)
+		data = request.read()
 		decoded = data.decode('utf-8')
-	except UnicodeDecodeError:
+	except (UnicodeDecodeError, socket.timeout, urllib.error.URLError):
 		return 1
 	return decoded
 
-def parse1(channel):
-	output = {'items': []}
-	for i, child in enumerate(channel):
-		name = child.tag[child.tag.index('}')+1:]
-		if name == 'entry':
-			obj = {}
-			for x in child:
-				if x.tag[child.tag.index('}')+1:] == 'author':
-					obj['author'] = strip(x[0].text)
-				else:
-					obj[x.tag[child.tag.index('}')+1:]] = strip(x.text)
-			output['items'].append(obj)
-		else:
-			output[name] = child.text
-	return output
-
-def parser(channel):
-	output = {'items': []}
-	for index, item in enumerate(channel[0]):
-		if item.tag == 'item':
-			output['items'].append({x.tag: strip(x.text) for x in item})
-		else:
-			output[item.tag] = item.text
-	if len(output['items']) == 0:
-		return parse1(channel)
-	return output
-
-def rss(rss_url):
-	try:
-		data = download(rss_url)
-	except:
-		return (0, 'None')
+def parse(data):
 	root = ET.fromstring(data)
-	current = parser(root)
-	title = current['title']
-	if os.path.exists('previous/RSS/' + title):
-		with open('previous/RSS/' + title, 'r') as pfile:
-			d = pfile.read()
-			r = ET.fromstring(d)
-			previous = parser(r)
-	else:
-		previous = current
-		with open('previous/RSS/' + title, 'w') as pfile:
-			pfile.write(data)
+	items = root.findall('.//item')
+	if len(items) == 0:
+		items = []
+		for i in root:
+			if 'entry' in i.tag:
+				items.append(i)
+	output = []
+	for child in items:
+		output.append({strbrackets(i.tag):strip(i.text, i) for i in child})
+	return output
+
+def rss(rss_url, title):
+	data = download(rss_url)
+	if data == 1:
 		return (0, 'None')
-	
-	difference = [x for x in current['items'] if x not in previous['items']]
-	newamount = len(difference)
-	if newamount:
-		with open('previous/RSS/' + title, 'w') as pfile:
-			pfile.write(data)
-		return (1, difference, newamount)
+	current = parse(data)
+	if not os.path.exists('previous/RSS/' + title):
+		with open('previous/RSS/' + title, 'w') as rfile:
+			rfile.write(data)
+		return (0, 'None')
+	with open('previous/RSS/' + title, 'r') as rfile:
+		previous = parse(rfile.read())
+	difference = [x for x in current if x not in previous]
+	if len(difference):
+		with open('previous/RSS/' + title, 'w') as rfile:
+			rfile.write(data)
+		return (1, difference)
 	return (0, 'None')
 
 
