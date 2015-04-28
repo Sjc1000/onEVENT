@@ -1,6 +1,6 @@
 # onEVENT
 
-onEVENT is an event based automation tool for Linux. It watches events such as battery percentage, input devices, cpu and even facebook notifications. You can specify any Terminal command to run when these event results are what you want them to be.
+onEVENT is an event based automation tool for Linux. It watches events such as battery percentage, input devices, cpu and even facebook notifications. You can specify any Terminal command to be run when these event results are what you want them to be.
 
 ## Command line arguments
 
@@ -9,6 +9,7 @@ This program supports a few command line params. None of these are needed to run
 - --verbose | -v : Verbose mode. Tells the program to output information to the terminal. It uses my pprint lib which makes things look purrdy :3
 - --folder	 : The folder the event files are located in. Defaults to events/
 - --file	 : The JSON file that your events are in. Defaults to events.json
+- --timeout	 : The delay between checking all the events. Defaults to 1.
 
 ## Event file
 
@@ -70,7 +71,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 - [X]	Brightness
 - [X]	CPU Percentage
 - [ ]	Email
-- [X]	Facebook Notification ( Outdated, use RSS )
+- [X]	Facebook Notification ( Outdated. Use the RSS event now :) )
 - [X]	File changed
 - [X]	Filepath Exists
 - [X]	Input Device plugged in
@@ -102,11 +103,11 @@ The battery percentage may not be the same as your monitor one is. This does not
 I might be doing the math wrong, but i've checked multiple sources and they all they thats how you do it.
 
 ####Facebook Notification
-Yes, you heard right! This program supports Facebook Notifications. This runs through the RSS event. So make sure to use that one!
+Yes, you heard right! This program supports Facebook Notifications. This runs through the RSS event now. So make sure to use that one!
 
 1. Open your facebook to https://www.facebook.com/notifications
 2. Click the little RSS button. This is next to the 'Get Notifications via Text message'.
-4. Paste the link into your event param, the next param can be anything, just make it different since it uses this to store the previous RSS info. So something like 'Facebook_Feed'.
+4. Paste the link into your event param, the next param can be anything, just make it different since it uses this as the name of the file that stores the previous RSS info. So something like 'Facebook_Feed'.
 
 ####RAM
 
@@ -120,6 +121,7 @@ Yes, you certainly can. It is very easy.
 
 Just make a new .py file in the events folder, name it whatever you want.
 Inside the file define a function that is the same as your file name. For example if i want, say a weather event. Ill name it weather.py and put in
+
 ```Python
 def weather(params):
 	#code
@@ -137,7 +139,7 @@ or
 return (0, 'Param1', 'Param2')
 ```
 
-If the first item is 1 the event returns true, 0 is false. You can also return params, which use can use in the 'action' in the events file.
+If the first item is 1 the event returns true, 0 is false. You can also return params, which can be used in the 'action' in the events file.
 
 For example, if i return (1, 'This is a test!')
 and in the action i use {0}, {0} will get replaced with This is a test!
@@ -204,9 +206,9 @@ If you wish to contact me you can use any of these methods:
 - IRC
 	I am on IRC quite often.
 	server:	irc.freenode.net ( port 6667 by default )
-	channel: #Sjc_Bot is my channel, If im Sjc_AFK i am not connected. I have a bouncer that changed to AFK when i disconnect.
+	channel: #Sjc_Bot is my channel, If im Sjc_AFK i am not connected. I have a bouncer that changes to AFK when i disconnect.
 
 
 ## Thanks
 
-Thank you for using my software. This is and always will be a free to use program. I will not charge a dime for any of my solo development projects.
+Thank you for using my software. This is and always will be free to use. I will not charge a dime for any of my solo development projects.

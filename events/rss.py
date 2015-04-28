@@ -64,9 +64,17 @@ def parse(data):
 	return output
 
 def rss(rss_url, title):
+	'''rss
+	An RSS feed event.
+	params:
+		- rss_url - The url of the rss feed.
+		- title - The name of the RSS. This is used to name the previous file.
+	output:
+		- an array of new rss events. If you specify iterate 1 in the .json file the output will be looped. If not... Im not sure ;)
+	'''
 	data = download(rss_url)
 	if data == 1:
-		return (0, 'None')
+		return (-1, 'Error')
 	current = parse(data)
 	if not os.path.exists('previous/RSS/' + title):
 		with open('previous/RSS/' + title, 'w') as rfile:

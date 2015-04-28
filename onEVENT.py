@@ -1,3 +1,4 @@
+#!/urs/bin/env python3
 import json
 import os
 import imp
@@ -9,9 +10,31 @@ from pprint import pprint, colors as c
 import argparse
 import sys
 
-__version__ = '2.1.0'
+'''
+	onEVENT is an event based automation system for Linux made by Sjc1000 
+				( Steven J. Core )
+			Copyright © 2015, Steven J. Core.
+	
+	onEVENT is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+__version__ = '1.1.2'
 
 class newevent():
+	'''newevent
+	A class for handling all the event data. With a few methods. Such as run and reload.
+	'''
 	events = None
 	action = None
 	delay = None
@@ -29,6 +52,10 @@ class newevent():
 		self.iterate = int(iterate)
 		
 	def run(self, sources):
+		'''run
+		Runs the event file.
+		Loading from the sources dictionary.
+		'''
 		output = []
 		for event in self.events:
 			function = getattr(sources[event['event']], event['event'])
@@ -36,6 +63,9 @@ class newevent():
 		return output
 	
 	def reload(self):
+		'''reload
+		Attemps to reload info from the event file.
+		'''
 		with open(eventfile, 'r') as efolder:
 			data = efolder.read()
 		obj = json.loads(data)
@@ -44,13 +74,21 @@ class newevent():
 		self.events = obj[self.id]['on']
 		self.action = obj[self.id]['action']
 		if self.alternative != None:
-			self.alternatice = obj[self.id]['alternative']
+			self.alternative = obj[self.id]['alternative']
 		return 0
 
 class onEVENT():
+	'''onEVENT class
+	The base system of onEVENT.
+	'''
 	events = []
 	sources = {}
 	def __init__(self, eventfolder, eventfile):
+		'''__init__
+		params:
+			- eventfolder - The folder where all the events are stored.
+			- eventfile - The event json file to load from.
+		'''
 		self._eventfolder = eventfolder
 		self._eventfile = eventfile
 		self.loadevents()
@@ -64,6 +102,11 @@ class onEVENT():
 			pprint('Now watching events.')
 	
 	def reloadloop(self):
+		'''reloadloop
+		The reload loop. Started in a different thread.
+		This attemps to reload event data while the program is in use.
+		It will only do this if you run onEVENT -r
+		'''
 		while True:
 			for event in self.events:
 				event.reload()
@@ -71,6 +114,9 @@ class onEVENT():
 		return 0
 	
 	def loadevents(self):
+		'''loadevents
+		Loads all the events and creates event classes.
+		'''
 		with open(self._eventfile) as efile:
 			edata = json.loads(efile.read())
 		if verbose:
@@ -91,6 +137,12 @@ class onEVENT():
 		return 0
 	
 	def checktime(self, event):
+		'''checktime
+		Checks the events last time against the current time.
+		This returns 1 if the event can be run.
+		params:
+			- event - The event to check.
+		'''
 		current_time = time.time()
 		c = current_time - event.last_time
 		m, s = divmod(c, 60)
@@ -102,12 +154,18 @@ class onEVENT():
 		return 0
 	
 	def checkoutput(self, event, event_data):
+		'''checkoutput
+		Checks the output of an event against the last event data.
+		'''
 		for index, response in enumerate(event_data):
 			if response[0] != int(event.events[index]['result']):
 				return 0
 		return 1
 	
 	def eventloop(self, timeout=1):
+		'''eventloop
+		The main event loop. Runs all the events.
+		'''
 		while True:
 			for index, event in enumerate(self.events):
 				event_thread = threading.Thread(target=self.callevent, args=(index, event))
@@ -116,21 +174,26 @@ class onEVENT():
 			time.sleep(timeout)
 	
 	def callevent(self, index, event):
+		'''callevent
+		Calls the event.
+		params:
+			- index - The index of the event.
+			- event - The event itself.
+		'''
 		current_time = time.time()
 		 
 		if event.last_time != None:
 			if self.checktime(event):
 				return 0
-		else:
-			self.events[index].last_time = current_time
-			return 0
 		
 		self.events[index].last_time = current_time
 		
 		event_data = event.run(self.sources)
 		check_data = [x[0] for x in event_data]
 		
-		
+		if event_data[0] == -1:
+			pprint(c['blue'] + ' [ ' + c['red'] + 'Error' + c['blue'] + ' ] > ' + event.events[0])
+			return 0
 		if event.last_data == None:
 			self.events[index].last_data = check_data
 				
@@ -170,7 +233,7 @@ class onEVENT():
 				call(command, stdout=DEVNULL)
 		return 0
 
-parser = argparse.ArgumentParser(description='onEVENT event based system for the Linux terminal.', prog='onEVENT')
+parser = argparse.ArgumentParser(description='onEVENT event based automation system for Linux.', prog='onEVENT')
 parser.add_argument('--file', help='The location of the file where your events are.', default='events.json')
 parser.add_argument('--folder', help='The folder where all the events are stored.', default='events/')
 parser.add_argument('-v', '--verbose', help='Verbose mode. Displays the output of everything', action='store_true')
