@@ -79,15 +79,15 @@ def rss(rss_url, title):
 	if not os.path.exists('previous/RSS/' + title):
 		with open('previous/RSS/' + title, 'w') as rfile:
 			rfile.write(data)
-		return (0, 'None')
+		return (0, None)
 	with open('previous/RSS/' + title, 'r') as rfile:
 		previous = parse(rfile.read())
-	difference = [x for x in current if x not in previous]
-	if len(difference):
-		with open('previous/RSS/' + title, 'w') as rfile:
+	with open('previous/RSS/' + title, 'w') as rfile:
 			rfile.write(data)
+	difference = [x for x in current if str(x) not in str(previous)]
+	if len(difference):
 		return (1, difference)
-	return (0, 'None')
+	return (0, None)
 
 
 main()

@@ -191,8 +191,8 @@ class onEVENT():
 		event_data = event.run(self.sources)
 		check_data = [x[0] for x in event_data]
 		
-		if event_data[0] == -1:
-			pprint(c['blue'] + ' [ ' + c['red'] + 'Error' + c['blue'] + ' ] > ' + event.events[0])
+		if int(event_data[0][0]) == -1:
+			pprint(c['blue'] + ' [ ' + c['red'] + 'Error' + c['blue'] + ' ] > ' + event.events[0]['Event'])
 			return 0
 		if event.last_data == None:
 			self.events[index].last_data = check_data
