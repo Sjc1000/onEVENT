@@ -9,6 +9,7 @@ from subprocess import call, DEVNULL
 from pprint import pprint, colors as c
 import argparse
 import sys
+from event_server import server as event_server
 
 '''
 	onEVENT is an event based automation system for Linux made by Sjc1000 
@@ -100,6 +101,12 @@ class onEVENT():
 		
 		if verbose:
 			pprint('Now watching events.')
+		
+		if server:
+			self.server = event_server(host, port, local)
+			connect_thread = threading.Thread(target=self.server.connection_loop)
+			connect_thread.daemon = True
+			connect_thread.start()
 	
 	def reloadloop(self):
 		'''reloadloop
@@ -127,6 +134,7 @@ class onEVENT():
 			if not 'iterate' in ev:
 				ev['iterate'] = 0
 			new_event = newevent(ev['on'], ev['action'], ev['repeat'], ev['delay'], ev['alternative'], index, ev['iterate'])
+			pprint('\tCreating event class > ' + ', '.join([x['event'] for x in ev['on']]) ) 
 			self.events.append(new_event)
 		
 		filelist = [f for f in os.listdir(self._eventfolder) if f.endswith('.py')]
@@ -134,6 +142,7 @@ class onEVENT():
 			pprint('Importing event source files.')
 		for event in filelist:
 			self.sources[event[:event.index('.')]] = imp.load_source(event, self._eventfolder + event )
+			pprint('\tImporting ' + event)
 		return 0
 	
 	def checktime(self, event):
@@ -192,7 +201,7 @@ class onEVENT():
 		check_data = [x[0] for x in event_data]
 		
 		if int(event_data[0][0]) == -1:
-			pprint(c['blue'] + ' [ ' + c['red'] + 'Error' + c['blue'] + ' ] > ' + event.events[0]['Event'])
+			pprint(c['blue'] + ' [ ' + c['red'] + 'Error' + c['blue'] + ' ] > ' + c['end'] + event.events[0]['event'])
 			return 0
 		if event.last_data == None:
 			self.events[index].last_data = check_data
@@ -203,6 +212,14 @@ class onEVENT():
 			space1 = 15-len(event.events[0]['event'])
 			space = 25-len(', '.join(event.events[0]['params'])[:24])
 			pprint( c['blue'] + '[ ' + c['green'] + event.events[0]['event'][:13] + c['blue'] + ' '*space1 + '| ' + c['red'] + ', '.join(event.events[0]['params'])[:24] + ' ' * space + c['blue'] + '| ' + c['green'] + str(check_data) + c['blue'] + ' ]')
+		if server:
+			e = event.events
+			for a, b in zip(enumerate(e), event_data):
+				i, a = a
+				a['output'] = b
+				e[i] = a
+			self.server.send(json.dumps(e))
+				
 		params = []
 		output = self.checkoutput(event, event_data)
 		
@@ -240,12 +257,28 @@ parser.add_argument('-v', '--verbose', help='Verbose mode. Displays the output o
 parser.add_argument('-r', '--reload', help='Makes the program attempt to reload info from the event file every 60 seconds. Will not add new events just reloads current event info.', action='store_true')
 parser.add_argument('-V', action='version', version='%(prog)s is currently version ' + str(__version__))
 parser.add_argument('-T', '--timeout', help='The timeout between the checking the events.', default=1, type=int)
+parser.add_argument('-s', '--server', help='Turns this into a server.', action='store_true', default=False)
+parser.add_argument('-o', '--host', help='The host for this to run on.', type=str, default='')
+parser.add_argument('-p', '--port', help='The port for this to run on.', type=int, default=9987)
+parser.add_argument('-l', '--local', action='store_true', help='Run it locally or online.', default=False)
 
 args = parser.parse_args()
 verbose = args.verbose
 eventfile = args.file
 attemptreload = args.reload
 
+
+if args.server:
+	server = True
+	host = args.host
+	port = args.port
+	local = args.local
+else:
+	server = False
+
 if __name__ == '__main__':
-	onEVENT = onEVENT(args.folder,args.file)
-	onEVENT.eventloop(args.timeout)
+	try:
+		onEVENT = onEVENT(args.folder,args.file)
+		onEVENT.eventloop(args.timeout)
+	except KeyboardInterrupt:
+		pprint('Shutting down.', 'red')

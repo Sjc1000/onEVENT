@@ -6,10 +6,14 @@ onEVENT is an event based automation tool for Linux. It watches events such as b
 
 This program supports a few command line params. None of these are needed to run the program.
 
-- --verbose | -v : Verbose mode. Tells the program to output information to the terminal. It uses my pprint lib which makes things look purrdy :3
-- --folder	 : The folder the event files are located in. Defaults to events/
-- --file	 : The JSON file that your events are in. Defaults to events.json
-- --timeout	 : The delay between checking all the events. Defaults to 1.
+- --verbose -v		: Verbose mode. Tells the program to output information to the terminal. It uses my pprint lib which makes things look purrdy :3
+- --folder		: The folder the event files are located in. Defaults to events/
+- --file		: The JSON file that your events are in. Defaults to events.json
+- --timeout		: The delay between checking all the events. Defaults to 1.
+- --server -s		: Makes onEVENT send data through sockets.
+- --host -o		: The hostname to bind on. Defaults to ''
+- --port -p		: The port to bind on. Defaults to 9987
+- --local -l		: Makes it run on local mode. Not default.
 
 ## Event file
 
@@ -182,6 +186,10 @@ This is useful if you forget to turn down your volume and you get blasted with l
 ```
 
 **This has to be run with sudo python3 onEVENT.py**
+
+## Server
+
+onEVENT has the ability to send data over sockets. It sends event info in json format. It sends what you see in the .json file and the output of when that event is run.
 
 ## Notes
 

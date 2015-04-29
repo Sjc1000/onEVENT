@@ -1,3 +1,8 @@
+**1.2.0**
+	
+	- Added server capability, you can now run onEVENT as a server.
+	- Bugfixes
+
 **1.1.2**
 
 	- Added in an error handling to onEVENT,
