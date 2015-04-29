@@ -30,7 +30,7 @@ from event_server import server as event_server
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 
 class newevent():
 	'''newevent
