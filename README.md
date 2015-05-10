@@ -28,6 +28,7 @@ battery(full) = 1:
 ``` 
 
 **Here is how it works**
+
 event(params) = result:
     repeat: 0
     delay: {'seconds': 0}
@@ -43,13 +44,20 @@ event(params) = result:
 
 ( optional )
 
-- alternative - The action to do when all of the events don't meet their result.
+- alternative - The action to do when one of the events don't meet their result.
 
 
 Each action should be seperated like the following:
 
 [['actioncommand', 'param1', 'param2'], ['another_action', '-t', 'param for -t']]    
 
+### Combining events
+
+You can combine events. It's really simple.
+
+```YAML
+event1(params) = 1 & event2(params) = 0:
+```
 
 ## Built in events
 
@@ -140,7 +148,8 @@ Fun huh? :D
 Here are a few quick examples of events you could set up.
 
 Notifies me when my battery is charging.
-```
+
+```YAML
 battery(charging) = 1:
     repeat: 0
     delay: {'seconds': 0}
@@ -149,7 +158,8 @@ battery(charging) = 1:
 ```
 
 Notifies me when my battery is full.
-```
+
+```YAML
 battery(full) = 1:
     repeat: 0
     delay: {'seconds': 0}
@@ -157,7 +167,8 @@ battery(full) = 1:
 ```
 
 Notifies me when i plug / unplug my hard drive.
-```
+
+```YAML
 exists(/media/steven/External) = 1:
     repeat: 0
     delay: {'seconds': 0}
@@ -167,7 +178,7 @@ exists(/media/steven/External) = 1:
 
 ## Server
 
-onEVENT has the ability to send data over sockets. It sends event info in json format. It sends what you see in the .json file and the output of when that event is run.
+onEVENT has the ability to send data over sockets. It sends event info in json format.
 
 ## Notes
 
