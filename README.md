@@ -17,54 +17,38 @@ This program supports a few command line params. None of these are needed to run
 
 ## Event file
 
-Ill explain how to add things to the event file so you can have your own events!
+The new version of onEVENT uses a simple version of YAML for the event file.
+Here is an example of the new event file.
 
-First, ill show you an example of an event.
+```YAML
+battery(full) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'Battery', 'Battery is fully charged.']]
+``` 
 
-```JSON
-{"on": [{"event": "inputdevice", "params": ["Logitech USB Receiver"], "result": "1"}],
-	"action": [["notify-send", "Mouse", "{0} connected."]],
-	"repeat": "0",
-	"delay": {"seconds": "0"}
-}
-```
-This is what it all means:
+**Here is how it works**
+event(params) = result:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['some', 'action']]
 
-```JSON
-{"on": [{"*event*": "**inputdevice**", "*params*": ["**Logitech USB Receiver**"], "*result*": "**1**"}],
-	"*action*": **[["notify-send", "Mouse", "{0} connected."]]**,
-	"*repeat*": "**0**",
-	"*delay*": **{"seconds": "**0**"}**
-}
-```
+- event is the event name.
+- params is a comma seperated list of params
+- result is what state you want the event to be in to do the action.
 
-The things with * are the params, and the ** things are values, the ** items are the one you change.
-
-###params
-
-**event** - Change this to the event you want to check, this is the name of the event file in the events folder. Without the .py extension
-
-**params** - The params you wish to pass to the event file, each event file has different params so i can't cover all of them here. Use python eventfile.py to find out info about each event.
-
-**result** - This is 1 if you want the event to be true, 0 if you want the event to be false.
-
-**action** - The linux terminal command/s to run when the *result* matches the event outcome.
-
-**repeat** - 1 if you want this command to repeat until the event is false, 0 if you want the command to run 1 time until the command is false.
-
-**delay** - The delay between checks if the event is true or false. Items can be any combination of seconds, minutes, hours.	{"seconds": 10, "minutes": 4} will check an event every 4 minutes and 10 seconds.
+- repeat - Specify 1 if you want this to repeat over and over, even if the state doesn't go from True to false or False to True.
+- delay - The delay in between the event's run.
+- action - The action to do when all events meet their result.
 
 ( optional )
 
-**alternative** - The linux terminal command to run when the event is false.
- 
- 
- **notes**
- 
- You can add more than 1 event, they will all have to match their *result* to be true, if not it will be false.
- 
- You will notice that the terminal commands are split up, ["command", "param 1", "param 2", "-b", "param for -b"]
- This is so my program knows where the params are.
+- alternative - The action to do when all of the events don't meet their result.
+
+
+Each action should be seperated like the following:
+
+[['actioncommand', 'param1', 'param2'], ['another_action', '-t', 'param for -t']]    
 
 
 ## Built in events
@@ -96,7 +80,7 @@ This is a list of events i have built, and plan to build. Feel free to contact m
 
 Some of these commands load from files that may be different on your system. If you experience an error like 'FileNotFound' or something similar you may need to change some code. If you're not familiar with Python this may not be easy. 
 
-Please pay attention to what file the error is coming from then search for the linux file it may be. For example, if the battery event puts out an error like this google 'linux ( your distro ) battery class file' or something similar. 
+Please pay attention to what file the error is coming from then search for the linux file it may be. For example, if the battery event puts out an error google 'linux ( your distro ) battery class file' or something similar. 
 
 You will then need to change the directory in the event file. This should be easy to locate, since only 1 part of my code should look like a file directory.
 
@@ -155,37 +139,31 @@ Fun huh? :D
 
 Here are a few quick examples of events you could set up.
 
-**Notify you when your battery is full**
-```JSON
-{"on": [{"event": "battery", "params": ["full"], "result": "1"}],
-	"action": [["notify-send", "Battery", "Battery is now fully charged!"]],
-	"repeat": "0",
-	"delay": {"seconds": "5"}
-}
+Notifies me when my battery is charging.
+```
+battery(charging) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'Battery', 'Battery is charging ({0}%)']]
+    alternative: [['notify-send', 'Battery', 'Battery is discharging. ({0}%)']]
 ```
 
-**Lower system volume when the program Banshee ( music player ) is open. Volume back to 100% when Banshee is closed.**
-This is useful if you forget to turn down your volume and you get blasted with loud noise.
-```JSON
-{"on": [{"event": "procexists", "params": ["banshee"], "result": "1"}],
-	"action": [["amixer", "sset", "'Master'", "60%"]],
-	"repeat": "0",
-	"delay": {"seconds": "1"},
-	"alternative": [["amixer", "sset", "'Master'", "100%"]]
-}
+Notifies me when my battery is full.
+```
+battery(full) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'Battery', 'Battery is fully charged.']]
 ```
 
-**If the time is past 10pm and you close your lid. Shut the PC down.**
-```JSON
-{"on": [{"event": "lidclosed", "params": [], "result": "1"},
-		{"event": "time", "params": ["later", "%H", "22"], "result": "1"}],
-	"action": [["shutdown", "-h", "now"]],
-	"repeat": "0",
-	"delay": {"seconds": "1"}
-}
+Notifies me when i plug / unplug my hard drive.
 ```
-
-**This has to be run with sudo python3 onEVENT.py**
+exists(/media/steven/External) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'External HD', 'External HD has been plugged in.']]
+    alternative: [['notify-send', 'External HD', 'External HD has been un-plugged.']]
+```
 
 ## Server
 
