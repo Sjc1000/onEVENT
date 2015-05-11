@@ -1,0 +1,17 @@
+battery(charging) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'Battery', 'Battery is charging ({0}%)']]
+    alternative: [['notify-send', 'Battery', 'Battery is discharging. ({0}%)']]
+
+battery(full) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'Battery', 'Battery is fully charged.']]
+
+exists(/media/steven/External) = 1:
+    repeat: 0
+    delay: {'seconds': 0}
+    action: [['notify-send', 'External HD', 'External HD has been plugged in.']]
+    alternative: [['notify-send', 'External HD', 'External HD has been un-plugged.']]
+
