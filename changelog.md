@@ -1,4 +1,9 @@
+**1.3.1**
+
+    - Now checks for PyYAML, and if it doesn't have it. Used my custom breed of YAML.
+
 **1.3.0**
+
     - Changed from JSON syntax to a custom breed of YAML
 
 **1.2.0**

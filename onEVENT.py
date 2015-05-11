@@ -11,7 +11,13 @@ import argparse
 import sys
 import socketserver
 from cprint import cprint
-import eventparser
+
+try:
+    old_parser = False
+    import eventparser as eventparser
+except ImportError:
+    old_parser = True
+    import old_eventparser as eventparser
 
 """
     onEVENT is an event based automation system for Linux made by Sjc1000 
@@ -33,7 +39,7 @@ import eventparser
 """
 
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 
 
 def timestamp():
@@ -56,12 +62,20 @@ class NewEvent():
     alternative = None
     def __init__(self, events, action, repeat, delay, alternative=None,
                  id=None, iterate=0):
+         
         self.events = events
-        self.action = ast.literal_eval(action)
         self.repeat = repeat
-        self.delay = ast.literal_eval(delay)
-        if alternative is not None:
-            self.alternative = ast.literal_eval(alternative)
+        
+        if old_parser is False:
+            self.action = action
+            self.delay = delay
+            if alternative is not None:
+                self.alternative = alternative
+        else:
+            self.action = ast.literal_eval(action)
+            self.delay = ast.literal_eval(delay)
+            if alternative is not None:
+                self.alternative = ast.literal_eval(alternative)
         self.id = id
         self.iterate = iterate
         
@@ -87,7 +101,7 @@ class onEVENT():
         """__init__
         params:
             - eventfolder - The folder where all the events are stored.
-            - eventfile - The event json file to load from.
+            - eventfile - The event file to load from.
         """
         self._eventfolder = eventfolder
         self._eventfile = eventfile
@@ -116,10 +130,12 @@ class onEVENT():
         """
         while True:
             time.sleep(60)
-            self.loadevents()
+            if verbose:
+                cprint('[.green] Reloading events.', '[.purple]' + timestamp())
+            self.loadevents(True)
         return None
     
-    def loadevents(self):
+    def loadevents(self, forcenoverbose=False):
         """loadevents
         Loads all the events and creates event classes.
         """
@@ -127,9 +143,10 @@ class onEVENT():
         with open(self._eventfile) as efile:
             edata = eventparser.parse(efile.read())
 
-        if verbose:
+        if verbose and forcenoverbose is False:
             cprint(' Reading event file and creating event classes.',
                    '[.purple]' + timestamp())
+        
         for index, ev in enumerate(edata):
             if not 'alternative' in ev:
                 ev['alternative'] = None
@@ -139,7 +156,7 @@ class onEVENT():
                 ev['on'], ev['action'], ev['repeat'], 
                 ev['delay'], ev['alternative'], index, ev['iterate'])
             
-            if verbose:
+            if verbose and forcenoverbose is False:
                 cprint('\t[.blue]Creating event class > [.green]' + 
                        ', '.join([x['event'] for x in ev['on']]),
                        '[.purple]' + timestamp())
@@ -147,15 +164,19 @@ class onEVENT():
         
         filelist = [f for f in os.listdir(self._eventfolder) if 
                     f.endswith('.py')]
-        if verbose:
+        if verbose and forcenoverbose is False:
             cprint(' Importing event source files.',
                    '[.purple]' + timestamp())
         for event in filelist:
-            if verbose:
+            if verbose and forcenoverbose is False:
                 cprint('\t[.blue]Importing [.green]' + event, '[.purple]' + 
                        timestamp(), '\n[.red]')
-            self.sources[event[:event.index('.')]] = imp.load_source(
-                event, self._eventfolder + event )
+            try:
+                self.sources[event[:event.index('.')]] = imp.load_source(
+                    event, self._eventfolder + event )
+            except Exception as Error:
+                if forcenoverbose is False:
+                    cprint('[.red] Error raised while importing ' + event + ': ' + str(Error), '[.purple]' + timestamp())
         return None
     
     def checktime(self, event):
@@ -215,7 +236,8 @@ class onEVENT():
         try:
             event_data = event.run(self.sources)
         except Exception as Error:
-            cprint(' [.red]Error raised in event - ' + 
+            if verbose:
+                cprint(' [.red]Error raised in event - ' + 
                    ', '.join([x['event'] for x in event.events]) + 
                    ' - ' + str(Error), '[.purple]' + timestamp())
             return None

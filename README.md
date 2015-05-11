@@ -17,8 +17,59 @@ This program supports a few command line params. None of these are needed to run
 
 ## Event file
 
-The new version of onEVENT uses a simple version of YAML for the event file.
-Here is an example of the new event file.
+onEVENT uses a 3rd party library for YAML parsing. If you don't have this, it uses my old parser.
+
+When you have PyYAML
+
+```YAML
+- onEVENT:
+    repeat: 0
+    delay:
+        seconds: 1
+    when:
+        - procexists:
+            params: 
+                - banshee
+            result: True
+    do:
+        - action:
+            - notify-send
+            - Banshee open
+            - Lowering your volume so you don't get blasted with sound!
+        - action:
+            - amixer
+            - set
+            - Master
+            - 60%
+    alternative:
+        - action:
+            - notify-send
+            - Banshee closed
+            - Raising volume back to 100%
+        - action:
+            - amixer
+            - set
+            - Master
+            - 100%
+```
+
+**Here is how it works**
+
+- repeat - Specify 1 if you want this to repeat over and over, even if the state doesn't go from True to false or False to True.
+- delay - The delay between running of events. Can be a combonation of seconds minutes or hours.
+- when - Events to run
+- params - The params for the event.
+- result - What you want the event to be. True / False / 1 / 0
+- do - The actions
+- action - The linux command to run. Each param is seperated by newline or like [param1, param2, param2]. You can specify more than one of these.
+
+( optional )
+
+- alternative - The alternative actions to run.
+- action - The linux command to run when the event switches to false. You can specify more than one of these.
+
+
+When you don't have PyYAML
 
 ```YAML
 battery(full) = 1:
@@ -40,7 +91,7 @@ event(params) = result:
 
 - repeat - Specify 1 if you want this to repeat over and over, even if the state doesn't go from True to false or False to True.
 - delay - The delay in between the event's run.
-- action - The action to do when all events meet their result.
+- action - The action to do when all events meet their result. 
 
 ( optional )
 
@@ -146,6 +197,27 @@ Fun huh? :D
 ## Examples
 
 Here are a few quick examples of events you could set up.
+
+When you have the YAML library.
+
+```YAML
+- onEVENT:
+    repeat: 0
+    delay:
+        seconds: 1
+    when:
+        - newfile:
+            params:
+                - /media/steven/
+            result: True
+    do:
+        - action:
+            - notify-send
+            - New mount
+            - A new directory has been mounted "{0}"
+```
+
+When you don't have the YAML library.
 
 Notifies me when my battery is charging.
 

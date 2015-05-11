@@ -1,47 +1,35 @@
 #!/usr/bin/env python3
 
 """
-A parser for my events.
-Reads the info from event file into python.
+Parse the events.
+Requires PyYaml.
 """
 
-
-example = '''
-battery(full) = 1 & battery(charging) = 0:
-    repeat: 0
-    delay: {seconds: 0}
-    action: ["notify-send", "Battery", "Battery is full"]
-    
-battery(charging) = 1:
-    repeat: 0
-    delay: {seconds: 0}
-    action: ["notify-send", "Battery", "Battery is charging"]
-'''
+import yaml
 
 def parse(data):
+    p = yaml.load(data)
     output = []
-    index = -1
-    for line in data.split('\n'):
-        if line == '':
-            continue
-        if any(line.startswith(l) for l in [' ', '\t']) is False:
-            output.append({'on': None, 'repeat': None, 'delay': None, 
-                          'action': None, 'alternative': None, 'iterate': 
-                           None})
-            index += 1
-            events = [x.strip() for x in line.replace(':','').split('&')]
-            params = [x[x.index('(')+1: x.index(')')].split(',') 
-                      for x in events]
-            results = [int(x.split('=')[1].strip()) for x in events]
-            eventnames = [x[:x.index('(')] for x in events]
-            joined = [{'event':x[0], 'params': x[1], 'result': x[2]} for x 
-                     in zip(eventnames, params, results)]
-            output[index]['on'] = joined
-        else:
-            line = line.strip().split(':')
-            key = line[0].strip()
-            value = ':'.join(line[1:]).strip()
-            if key == '' or value == '':
-                continue
-            output[index][key] = value
+    for item in p:
+        obj = {'on': None, 'repeat': None, 'action': None, 'delay': None, 
+                'alternative': None, 'iterate': 0}
+        obj['delay'] = item['onEVENT']['delay']
+        obj['repeat'] = item['onEVENT']['repeat']
+        obj['action'] = [x['action'] for x in item['onEVENT']['do']]
+        events = [list(y.keys())[0] for y in item['onEVENT']['when']]
+        more = [x[events[i]] for i, x in enumerate(item['onEVENT']['when'])]
+        ev = []
+        for i, e in enumerate(events):
+            ev.append({'event': e, 'params': more[i]['params'], 'result': more[i]['result']})
+        obj['on'] = ev
+        
+        if 'alternative' in item['onEVENT']:
+            obj['alternative'] = [x['action'] for x in 
+                                  item['onEVENT']['alternative']]
+        #if 'iterate' in item['onEVENT']:
+        try:
+            obj['iterate'] = item['onEVENT']['iterate'] 
+        except KeyError:
+            obj['iterate'] = 0
+        output.append(obj)
     return output

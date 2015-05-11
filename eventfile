@@ -1,16 +1,81 @@
-battery(charging) = 1:
+- onEVENT:
     repeat: 0
-    delay: {'seconds': 0}
-    action: [['notify-send', 'Battery', 'Battery is charging ({0}%)']]
-    alternative: [['notify-send', 'Battery', 'Battery is discharging. ({0}%)']]
+    delay:
+        seconds: 1
+    when:
+        - procexists:
+            params: 
+                - banshee
+            result: True
+    do:
+        - action:
+            - notify-send
+            - Banshee open
+            - Lowering your volume so you don't get blasted with sound!
+        - action:
+            - amixer
+            - set
+            - Master
+            - 60%
+    alternative:
+        - action:
+            - notify-send
+            - Banshee closed
+            - Raising volume back to 100%
+        - action:
+            - amixer
+            - set
+            - Master
+            - 100%
 
-battery(full) = 1:
+- onEVENT:
     repeat: 0
-    delay: {'seconds': 0}
-    action: [['notify-send', 'Battery', 'Battery is fully charged.']]
+    delay:
+        seconds: 1
+    when:
+        - newfile:
+            params:
+                - /media/steven/
+            result: True
+    do:
+        - action:
+            - notify-send
+            - New mount
+            - A new directory has been mounted "{0}"
 
-exists(/media/steven/External) = 1:
+- onEVENT:
+    repeat: 1
+    iterate: 1
+    delay:
+        minutes: 5
+    when:
+        - rss:
+            params:
+                - http://ahkscript.org/boards/feed.php
+                - AHKScript_Feed
+            result: True
+    do:
+        - action:
+            - notify-send
+            - AHKScript Feed
+            - 'New post: {author} - {title} - {link}'
+
+- onEVENT:
     repeat: 0
-    delay: {'seconds': 0}
-    action: [['notify-send', 'External HD', 'External HD has been plugged in.']]
-    alternative: [['notify-send', 'External HD', 'External HD has been un-plugged.']]
+    delay:
+        seconds: 1
+    when:
+        - battery:
+            params:
+                - charging
+            result: True
+    do:
+        - action:
+            - notify-send
+            - Battery
+            - "Battery is charging. {0}%"
+    alternative:
+        - action:
+            - notify-send
+            - Battery
+            - "Battery is discharging. {0}%" 
