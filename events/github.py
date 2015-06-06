@@ -57,7 +57,7 @@ def PushEvent(e):
 	user = e['actor']['login']
 	size = e['payload']['size']
 	repo = e['repo']['name']
-	url = self.shorten_url('https://github.com/' + e['repo']['name'] + '/commits/master')
+	url = 'https://github.com/' + e['repo']['name'] + '/commits/master'
 	message = e['payload']['commits'][0]['message'][:25]
 	return user + ' pushed ' + str(size) + ' commit[s] to ' + repo + ' "' + message + '..." - ' + url
 	
@@ -65,7 +65,7 @@ def IssuesEvent(e):
 	user = e['actor']['login']
 	action = e['payload']['action']
 	repo = e['repo']['name']
-	url = self.shorten_url(e['payload']['issue']['html_url'])
+	url = e['payload']['issue']['html_url']
 	title = e['payload']['issue']['title'][:25]
 	return user + ' ' + action + ' the issue at ' + repo + ' "' + title + '..." - ' + url
 	
@@ -79,7 +79,7 @@ def IssueCommentEvent(e):
 	user = e['actor']['login']
 	name = e['payload']['issue']['title'][:25]
 	repo = e['repo']['name']
-	url = self.shorten_url(e['payload']['issue']['html_url'])
+	url = e['payload']['issue']['html_url']
 	return user + ' commented on the issue "' + name + '" at ' + repo + ' - ' + url
 	
 def WatchEvent(e):
@@ -91,14 +91,14 @@ def CreateEvent(e):
 	user = e['actor']['login']
 	reft = e['payload']['ref_type']
 	repo = e['repo']['name']
-	url = self.shorten_url(e['payload']['repository']['html_url'])
+	url = e['payload']['repository']['html_url']
 	return user + ' created a ' + reft + ' at ' + repo + ' - ' + url
 	
 def PullRequestEvent(e):
 	user = e['actor']['login']
 	action = e['payload']['action']
 	repo = e['repo']['name']
-	url = self.shorten_url(e['payload']['pull_request']['html_url'])
+	url = e['payload']['pull_request']['html_url']
 	return user + ' ' + action + ' a pull request to ' + repo + ' - ' + url
 
 
